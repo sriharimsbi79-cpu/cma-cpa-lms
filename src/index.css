@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* brand colour as R G B (default #2348C9) */
+    --brand: 35 72 201;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-page font-sans text-[15px] leading-normal text-ink antialiased;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--brand));
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-card border border-line bg-white;
+  }
+
+  .btn {
+    @apply inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] px-[18px] text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply btn bg-brand text-white hover:bg-brand/90;
+  }
+  .btn-secondary {
+    @apply btn border border-line-strong bg-white text-ink hover:bg-mist-4;
+  }
+  .btn-dark {
+    @apply btn bg-ink text-white hover:bg-ink/90;
+  }
+  .btn-warn {
+    @apply btn bg-warn-strong text-white hover:bg-warn-strong/90;
+  }
+
+  .field {
+    @apply h-11 w-full rounded-[10px] border border-line-strong bg-white px-3 text-sm text-ink placeholder:text-ink-3;
+  }
+  .field-label {
+    @apply text-xs font-bold text-ink-2;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full px-3 py-1.5 text-[13px] font-semibold;
+  }
+
+  .link-brand {
+    @apply inline-flex min-h-11 items-center text-sm font-bold text-brand hover:underline;
+  }
+
+  /* keeps screen-reader-only labels inside scrollable tables */
+  .overflow-x-auto {
+    position: relative;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+}
