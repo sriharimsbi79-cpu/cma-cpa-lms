@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Bell, ChevronRight, Download, FileText, Lock, LogOut, MessageCircle, Monitor, Pencil, Smartphone } from 'lucide-react';
+import { Bell, ChevronRight, Download, FileText, LayoutDashboard, Lock, LogOut, MessageCircle, Monitor, Pencil, Smartphone } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { Avatar, ErrorState, Field, Modal, PageLoader, Pill } from '@/components/ui';
 import { useAccount, useCatalog, useNotifications, useRemoveDevice, useUpdateProfile } from '@/lib/api';
@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/auth';
 import { getDeviceId } from '@/lib/device';
 import { formatDate, formatRelative, inr } from '@/lib/format';
 import { isDemo } from '@/lib/supabase';
-import type { Account, AccessGroup } from '@/lib/types';
+import { isStaffRole, type Account, type AccessGroup } from '@/lib/types';
 
 export const SUPPORT_CONTACT = '[YOUR SUPPORT EMAIL / WHATSAPP NUMBER]';
 const RENEW_NOTE = 'Online renewal opens here once payments are connected. Please contact the academy to renew.';
@@ -241,7 +241,7 @@ function SettingsRow({ icon, label, extra, onClick, last }: { icon: ReactNode; l
 
 export default function Profile() {
   const { data: account, isLoading, error, refetch } = useAccount();
-  const { signOut } = useAuth();
+  const { signOut, me } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
   const [params, setParams] = useSearchParams();
@@ -422,6 +422,15 @@ export default function Profile() {
         <SettingsRow icon={<Bell aria-hidden className="size-[18px]" />} label="Notifications" onClick={() => setSheet('notifications')} />
         <SettingsRow icon={<MessageCircle aria-hidden className="size-[18px]" />} label="Help and support" onClick={() => setSheet('help')} last />
       </section>
+
+      {/* phone: staff reach the admin panel from here (desktop has it in the sidebar) */}
+      {(isDemo || isStaffRole(me?.role)) && (
+        <Link to="/admin" className="card flex min-h-14 items-center gap-3 px-4 py-3 text-[15px] font-semibold lg:hidden">
+          <LayoutDashboard aria-hidden className="size-[18px] text-ink-2" />
+          <span className="flex-1">Admin panel</span>
+          <ChevronRight aria-hidden className="size-5 text-ink-3" />
+        </Link>
+      )}
 
       {/* log out */}
       <section aria-labelledby="out-h" className="flex flex-col gap-1 lg:card lg:flex-row lg:flex-wrap lg:items-center lg:justify-between lg:gap-4 lg:px-7 lg:py-[22px]">
