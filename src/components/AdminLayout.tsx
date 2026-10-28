@@ -16,7 +16,7 @@ import {
 import { useAuth } from '@/lib/auth';
 import { cx } from '@/lib/format';
 import { isDemo } from '@/lib/supabase';
-import { Avatar, BRAND_INITIALS, BRAND_NAME, DemoBanner } from './ui';
+import { Avatar, BRAND_INITIALS, BRAND_NAME } from './ui';
 
 const ROLE_LABEL = { student: 'Student', faculty: 'Faculty', admin: 'Admin', super_admin: 'Super admin' } as const;
 
@@ -155,7 +155,6 @@ export default function AdminLayout() {
       )}
 
       <div className="min-w-0 flex-1">
-        {isDemo && <DemoBanner />}
         <main className="px-4 pb-14 pt-5 sm:px-6 lg:px-12 lg:pt-8">
           <div className="mx-auto w-full max-w-admin">
             <Outlet />

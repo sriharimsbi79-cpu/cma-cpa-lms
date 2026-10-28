@@ -5,6 +5,7 @@ import { useToast } from '@/components/Toast';
 import { ChipGroup, Field, NOT_CONNECTED } from '@/components/ui';
 import { courseOptions } from '@/data/adminDemo';
 import { cx, plural } from '@/lib/format';
+import { isDemo } from '@/lib/supabase';
 
 const COLUMNS = [
   { name: 'chapter', text: 'Chapter number, e.g. 3' },
@@ -187,9 +188,11 @@ export default function BulkUpload() {
         <h1 className="text-[26px] font-extrabold leading-tight tracking-tight lg:text-[28px]">Bulk upload questions</h1>
         <p className="mt-1 text-sm text-ink-3">Add many multiple-choice questions at once from a spreadsheet. Add TBS and case-based questions in the question builder.</p>
       </header>
-      <p className="rounded-xl border border-warn-line bg-warn-bg px-3.5 py-2 text-xs font-semibold text-warn-fg">
-        You can check your file here, but importing is not connected to the database yet.
-      </p>
+      {!isDemo && (
+        <p className="rounded-xl border border-warn-line bg-warn-bg px-3.5 py-2 text-xs font-semibold text-warn-fg">
+          You can check your file here, but importing is not connected to the database yet.
+        </p>
+      )}
 
       <Step n={1} title="Download the template">
         <p className="text-sm text-ink-2">Fill it in Excel or Google Sheets, one question per row, then save it as a CSV file. Keep the first row with the column names.</p>

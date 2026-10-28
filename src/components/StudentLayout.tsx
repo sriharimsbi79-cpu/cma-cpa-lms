@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { cx } from '@/lib/format';
 import { isDemo } from '@/lib/supabase';
 import { isStaffRole, type CatalogCourse } from '@/lib/types';
-import { Avatar, DemoBanner, LockIcon, Logo } from './ui';
+import { Avatar, LockIcon, Logo } from './ui';
 
 function useActiveCourseId(): string | null {
   const course = useMatch('/courses/:courseId');
@@ -195,7 +195,6 @@ export default function StudentLayout() {
     <div className="min-h-screen bg-page lg:flex">
       <Sidebar />
       <div className="min-w-0 flex-1">
-        {isDemo && <DemoBanner />}
         <main className={cx('w-full px-4 pb-28 pt-5 sm:px-6 lg:px-12 lg:pb-14 lg:pt-8', onChapter && 'pb-32')}>
           <div className="mx-auto w-full max-w-content">
             <Outlet />

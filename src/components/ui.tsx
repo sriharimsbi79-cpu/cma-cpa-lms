@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, Lock, RefreshCw, X } from 'lucide-react';
 import { cx, initials } from '@/lib/format';
+import { isDemo } from '@/lib/supabase';
 import type { AccessStatus, CourseKind } from '@/lib/types';
 
 export const BRAND_NAME = '[Your Academy]';
@@ -319,6 +320,8 @@ export function Switch({ checked, onChange, label, hint }: { checked: boolean; o
 /** Shown on screens that only have sample data so far. */
 export const NOT_CONNECTED = 'This screen is not connected to the database yet, so changes are not saved.';
 export function SampleNotice() {
+  // Not shown in demo mode, where every screen uses sample data anyway.
+  if (isDemo) return null;
   return (
     <p className="rounded-xl border border-warn-line bg-warn-bg px-3.5 py-2 text-xs font-semibold text-warn-fg">
       Sample data. This screen is not connected to the database yet.
@@ -326,10 +329,3 @@ export function SampleNotice() {
   );
 }
 
-export function DemoBanner() {
-  return (
-    <div className="border-b border-warn-line bg-warn-bg px-4 py-2 text-center text-xs font-semibold text-warn-fg">
-      Demo mode with sample data. To use your database, add your Supabase URL and anon key to the .env file.
-    </div>
-  );
-}

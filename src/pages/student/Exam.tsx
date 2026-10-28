@@ -6,6 +6,7 @@ import { Modal, PageLoader } from '@/components/ui';
 import { examQuestionsFor, saveAttempt, type ExamQuestion } from '@/data/exam';
 import { useTestInfo } from '@/lib/api';
 import { hasValue } from '@/lib/grading';
+import { isDemo } from '@/lib/supabase';
 import { clock, cx, plural } from '@/lib/format';
 import type { QuestionType } from '@/lib/types';
 
@@ -337,9 +338,11 @@ export default function Exam() {
         </div>
       </header>
 
-      <p className="border-b border-warn-line bg-warn-bg px-4 py-2 text-center text-xs font-semibold text-warn-fg">
-        Sample questions. This screen is not connected to your question bank yet.
-      </p>
+      {!isDemo && (
+        <p className="border-b border-warn-line bg-warn-bg px-4 py-2 text-center text-xs font-semibold text-warn-fg">
+          Sample questions. This screen is not connected to your question bank yet.
+        </p>
+      )}
 
       <div className="mx-auto flex w-full max-w-[1240px] flex-1 gap-6 px-4 pb-28 pt-4 sm:px-6 lg:pb-10 lg:pt-6">
         <main className="min-w-0 flex-1">
