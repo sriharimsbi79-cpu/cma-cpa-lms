@@ -81,12 +81,12 @@ function TestRow({ t, isCma, first, last }: { t: MockTest; isCma: boolean; first
       </span>
       <div className="flex gap-2">
         {attempted && !isPractice && (
-          <Link to={`${href}?attempt=${t.lastAttemptId}`} className="btn-secondary hidden px-4 lg:inline-flex">
+          <Link to={`/results/${t.lastAttemptId}`} className="btn-secondary hidden px-4 lg:inline-flex">
             Review answers
           </Link>
         )}
         <Link
-          to={action.label === 'Review' ? `${href}?attempt=${t.lastAttemptId}` : href}
+          to={action.label === 'Review' ? `/results/${t.lastAttemptId}` : href}
           className={cx('px-3.5 text-[13px] lg:px-4 lg:text-sm', action.primary ? 'btn-primary' : 'btn-secondary', action.label === 'Review' && 'lg:hidden')}
         >
           {action.label}

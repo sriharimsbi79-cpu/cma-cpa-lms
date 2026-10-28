@@ -8,9 +8,11 @@ import { ForgotPassword, Login, ResetPassword, Signup } from '@/pages/auth/AuthP
 import Chapter from '@/pages/student/Chapter';
 import Course from '@/pages/student/Course';
 import Courses from '@/pages/student/Courses';
+import Exam from '@/pages/student/Exam';
 import Home from '@/pages/student/Home';
 import MockTests from '@/pages/student/MockTests';
 import Profile from '@/pages/student/Profile';
+import Result from '@/pages/student/Result';
 import TestIntro from '@/pages/student/TestIntro';
 
 // Admin screens load only when someone opens /admin
@@ -19,7 +21,11 @@ const Content = lazy(() => import('@/pages/admin/Content'));
 const Questions = lazy(() => import('@/pages/admin/Questions'));
 const QuestionBuilder = lazy(() => import('@/pages/admin/QuestionBuilder'));
 const Students = lazy(() => import('@/pages/admin/Students'));
-const Placeholder = lazy(() => import('@/pages/admin/Placeholder'));
+const AdminMockTests = lazy(() => import('@/pages/admin/MockTests'));
+const MockBuilder = lazy(() => import('@/pages/admin/MockBuilder'));
+const BulkUpload = lazy(() => import('@/pages/admin/BulkUpload'));
+const Payments = lazy(() => import('@/pages/admin/Payments'));
+const Settings = lazy(() => import('@/pages/admin/Settings'));
 
 const wrap = (el: JSX.Element) => <Suspense fallback={<PageLoader />}>{el}</Suspense>;
 
@@ -30,6 +36,16 @@ export default function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* full-screen exam, outside the normal menu */}
+      <Route
+        path="/tests/:testId/attempt"
+        element={
+          <RequireAuth>
+            <Exam />
+          </RequireAuth>
+        }
+      />
 
       <Route
         element={
@@ -44,6 +60,7 @@ export default function App() {
         <Route path="chapters/:chapterId" element={<Chapter />} />
         <Route path="mock-tests" element={<MockTests />} />
         <Route path="tests/:testId" element={<TestIntro />} />
+        <Route path="results/:attemptId" element={<Result />} />
         <Route path="profile" element={<Profile />} />
       </Route>
 
@@ -60,11 +77,13 @@ export default function App() {
         <Route index element={wrap(<Dashboard />)} />
         <Route path="content" element={wrap(<Content />)} />
         <Route path="questions" element={wrap(<Questions />)} />
+        <Route path="questions/upload" element={wrap(<BulkUpload />)} />
         <Route path="questions/:questionId" element={wrap(<QuestionBuilder />)} />
         <Route path="students" element={wrap(<Students />)} />
-        <Route path="mock-tests" element={wrap(<Placeholder kind="mock-tests" />)} />
-        <Route path="payments" element={wrap(<Placeholder kind="payments" />)} />
-        <Route path="settings" element={wrap(<Placeholder kind="settings" />)} />
+        <Route path="mock-tests" element={wrap(<AdminMockTests />)} />
+        <Route path="mock-tests/:testId" element={wrap(<MockBuilder />)} />
+        <Route path="payments" element={wrap(<Payments />)} />
+        <Route path="settings" element={wrap(<Settings />)} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

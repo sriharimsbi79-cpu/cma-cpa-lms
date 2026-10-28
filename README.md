@@ -36,10 +36,12 @@ Push this folder to a GitHub repo, then in Lovable connect that repo (GitHub syn
 |---|---|
 | Login, Sign up, Forgot / Reset password | Dashboard |
 | Home (continue chapter, exam countdown, results, weak areas) | Content (courses → chapters → videos, eBook, chapter test) |
-| Courses → Part / Section → chapter list | Question bank (MCQ, TBS, CBQ filters) |
+| Courses → Part / Section → chapter list | Question bank (MCQ, TBS, CBQ filters) + bulk upload |
 | Chapter (videos → eBook → chapter test, notes, ask a doubt) | Question builder (all 8 question types, preview, review flow) |
-| Mock tests | Students (search, extend access, grant course, reset devices, block) |
-| Profile (details, validity, devices, payments, logout) | |
+| Mock tests | Mock tests list + builder |
+| Exam screen (timer, palette, flag, calculator, submit) | Students (search, extend access, grant course, reset devices, block) |
+| Result + answer review | Payments, packages, coupons |
+| Profile (details, validity, devices, payments, logout) | Settings (branding, device limit, reminders, staff roles) |
 
 ## Change before launch
 
@@ -48,12 +50,18 @@ Push this folder to a GitHub repo, then in Lovable connect that repo (GitHub syn
 - `src/index.css`: `--brand` color
 - `index.html`: page title
 
+## Screens with sample data only (UI ready, database not connected yet)
+
+These screens work and look final, but use sample data from `src/data/exam.ts` and `src/data/adminDemo.ts`. Each one shows a "not connected" note.
+
+- Student: exam screen (`/tests/:id/attempt`) and result + answer review (`/results/:attemptId`). Scoring runs in the browser with the same rules as the database (`src/lib/grading.ts`). To connect: use `start_test_attempt`, `get_attempt`, `save_attempt_response`, `submit_test_attempt`.
+- Admin: Mock tests list and builder, Bulk upload (reads and checks a real CSV file, import not connected), Payments / Packages / Coupons, Settings.
+- Sample prices on the Payments screen are placeholders.
+
 ## Not built yet
 
-- Exam screen (taking a test with timer); the test intro page is ready
 - Secure video player (VdoCipher): placeholder in `src/components/VideoPlayer.tsx`
-- Razorpay payments, invoices
-- Admin: Mock tests, Payments and Settings pages (placeholders), bulk question upload
+- Razorpay checkout and webhooks, GST invoices
 
 ## Folder map
 

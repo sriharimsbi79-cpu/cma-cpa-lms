@@ -1,23 +1,27 @@
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Calculator, ChevronLeft, Clock, Flag, Save, Table2 } from 'lucide-react';
-import { useToast } from '@/components/Toast';
 import { EmptyState, ErrorState, PageLoader } from '@/components/ui';
 import { useTestInfo } from '@/lib/api';
 import { durationLabel } from '@/lib/format';
 
 const KIND_LABEL = { chapter_test: 'Chapter test', full_mock: 'Full-length mock', practice_set: 'Practice set' } as const;
 
-/**
- * Test start page. The full-screen exam screen (timer, testlets, MCQ / TBS / CBQ
- * answer types) is the next screen to design and build; the database side is
- * ready: start_test_attempt → get_attempt → save_attempt_response → submit_test_attempt.
- */
+function hasSavedProgress(testId: string | undefined) {
+  try {
+    return !!testId && !!localStorage.getItem(`lms_exam_${testId}`);
+  } catch {
+    return false;
+  }
+}
+
+/** Test start page. "Start test" opens the full-screen exam screen. */
 export default function TestIntro() {
   const { testId } = useParams();
   const [params] = useSearchParams();
-  const toast = useToast();
+  const navigate = useNavigate();
   const { data: t, isLoading, error, refetch } = useTestInfo(testId);
   const reviewing = !!params.get('attempt');
+  const inProgress = hasSavedProgress(testId);
 
   if (isLoading) return <PageLoader />;
   if (error) return <ErrorState error={error} onRetry={() => refetch()} />;
@@ -56,13 +60,16 @@ export default function TestIntro() {
             </li>
           ))}
         </ul>
-        <button
-          type="button"
-          className="btn-primary h-12 rounded-xl text-[15px]"
-          onClick={() => toast.show('The full-screen exam screen is the next part to build. The database is already set up for it.', 'info')}
-        >
-          {reviewing ? 'Review answers' : 'Start test'}
-        </button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          {reviewing && (
+            <Link to={`/results/${params.get('attempt')}`} className="btn-secondary h-12 flex-1 rounded-xl text-[15px]">
+              Review last answers
+            </Link>
+          )}
+          <button type="button" className="btn-primary h-12 flex-1 rounded-xl text-[15px]" onClick={() => navigate(`/tests/${t.id}/attempt`)}>
+            {inProgress ? 'Continue test' : reviewing ? 'Retake test' : 'Start test'}
+          </button>
+        </div>
       </section>
     </div>
   );

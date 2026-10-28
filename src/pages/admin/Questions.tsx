@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Pencil, Plus, Upload } from 'lucide-react';
-import { useToast } from '@/components/Toast';
 import { ChipGroup, ErrorState, Pill, Skeleton } from '@/components/ui';
 import { PAGE_SIZE, useCourseTree, useQuestionCounts, useQuestions } from '@/lib/api';
 import { cx } from '@/lib/format';
@@ -31,7 +30,6 @@ const accText = (q: QuestionRow) => (q.percentCorrect === null ? '—' : `${Math
 const accCls = (q: QuestionRow) => (q.percentCorrect !== null && q.percentCorrect < 50 ? 'text-warn-text' : 'text-ink');
 
 export default function Questions() {
-  const toast = useToast();
   const [params] = useSearchParams();
   const [f, setF] = useState<QuestionFilters>({
     type: 'all',
@@ -62,10 +60,10 @@ export default function Questions() {
           <p className="mt-1 text-sm text-ink-3">Every chapter test and mock test picks its questions from here</p>
         </div>
         <div className="flex flex-wrap gap-2.5">
-          <button type="button" className="btn-secondary" onClick={() => toast.show('Bulk upload from Excel is not set up yet. Add questions one by one for now.', 'info')}>
+          <Link to="/admin/questions/upload" className="btn-secondary">
             <Upload aria-hidden className="size-4" />
-            Bulk upload from Excel
-          </button>
+            Bulk upload
+          </Link>
           <Link to="/admin/questions/new" className="btn-primary">
             <Plus aria-hidden className="size-4" strokeWidth={2.4} />
             Add question

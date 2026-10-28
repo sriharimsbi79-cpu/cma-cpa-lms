@@ -295,6 +295,37 @@ export function ChipGroup<T extends string>({
   );
 }
 
+export function Switch({ checked, onChange, label, hint }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint?: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4 py-1">
+      <span>
+        <span className="block text-sm font-semibold">{label}</span>
+        {hint && <span className="mt-0.5 block text-xs text-ink-3">{hint}</span>}
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-label={label}
+        onClick={() => onChange(!checked)}
+        className={cx('relative mt-0.5 h-7 w-12 shrink-0 rounded-full transition-colors', checked ? 'bg-brand' : 'bg-mist-3')}
+      >
+        <span className={cx('absolute top-1 size-5 rounded-full bg-white shadow transition-all', checked ? 'left-6' : 'left-1')} />
+      </button>
+    </div>
+  );
+}
+
+/** Shown on screens that only have sample data so far. */
+export const NOT_CONNECTED = 'This screen is not connected to the database yet, so changes are not saved.';
+export function SampleNotice() {
+  return (
+    <p className="rounded-xl border border-warn-line bg-warn-bg px-3.5 py-2 text-xs font-semibold text-warn-fg">
+      Sample data. This screen is not connected to the database yet.
+    </p>
+  );
+}
+
 export function DemoBanner() {
   return (
     <div className="border-b border-warn-line bg-warn-bg px-4 py-2 text-center text-xs font-semibold text-warn-fg">

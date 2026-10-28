@@ -418,7 +418,7 @@ function RecentResults() {
                     <td className={cx('px-3 py-2.5 text-ink-2', i < rows.length - 1 && 'border-b border-line-soft')}>{formatDate(r.submittedAt)}</td>
                     <td className={cx('px-3 py-2.5 font-extrabold', i < rows.length - 1 && 'border-b border-line-soft')}>{pct(r.percent)}</td>
                     <td className={cx('text-right', i < rows.length - 1 && 'border-b border-line-soft')}>
-                      <Link to={`/tests/${r.testId}?attempt=${r.attemptId}`} className="link-brand">
+                      <Link to={`/results/${r.attemptId}`} className="link-brand">
                         Review
                       </Link>
                     </td>

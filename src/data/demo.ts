@@ -157,7 +157,7 @@ export function courseShort(slug: string): string {
   return c.kind === 'skill' ? c.name : `${PROGRAMS[c.program].short} ${c.name}`;
 }
 
-const TEST_SCORES: Record<string, number> = { 'cma-part-1-ch1': 78, 'cma-part-1-ch2': 82, 'cpa-far-ch1': 74, 'cpa-far-ch2': 69, 'cpa-far-ch3': 71, 'cpa-far-ch4': 63 };
+const TEST_SCORES: Record<string, number> = { 'cma-part-1-ch1': 78, 'cma-part-1-ch2': 80, 'cpa-far-ch1': 74, 'cpa-far-ch2': 69, 'cpa-far-ch3': 71, 'cpa-far-ch4': 63 };
 
 export function courseChapters(courseId: string): ChapterRow[] {
   const c = COURSES.find((x) => x.slug === courseId);
@@ -286,9 +286,9 @@ export function resume(): Resume {
 
 export function recentResults(): RecentResult[] {
   return [
-    { attemptId: 'a1', testId: 'cma-part-1-mock-1', title: 'Full mock 1', kind: 'full_mock', courseLabel: 'CMA Part 1', chapterId: null, submittedAt: addDays(-7), percent: 68 },
-    { attemptId: 'a2', testId: 'cma-part-1-ch2-test', title: 'Chapter 2 test', kind: 'chapter_test', courseLabel: 'CMA Part 1', chapterId: 'cma-part-1-ch2', submittedAt: addDays(-10), percent: 82 },
-    { attemptId: 'a3', testId: 'cpa-far-mock-1', title: 'Full mock 1', kind: 'full_mock', courseLabel: 'CPA FAR', chapterId: null, submittedAt: addDays(-16), percent: 61 },
+    { attemptId: 'a1', testId: 'cma-part-1-mock-1', title: 'Full mock 1', kind: 'full_mock', courseLabel: 'CMA Part 1', chapterId: null, submittedAt: addDays(-7), percent: 70 },
+    { attemptId: 'a2', testId: 'cma-part-1-ch2-test', title: 'Chapter 2 test', kind: 'chapter_test', courseLabel: 'CMA Part 1', chapterId: 'cma-part-1-ch2', submittedAt: addDays(-10), percent: 80 },
+    { attemptId: 'a3', testId: 'cpa-far-mock-1', title: 'Full mock 1', kind: 'full_mock', courseLabel: 'CPA FAR', chapterId: null, submittedAt: addDays(-16), percent: 65 },
   ];
 }
 
@@ -326,13 +326,13 @@ function mock(courseId: string, kind: MockTest['kind'], title: string, n: number
 
 export function mockTests(): MockTest[] {
   return [
-    mock('cma-part-1', 'full_mock', 'Full mock 1', 1, { attempts: 1, lastPercent: 68, lastSubmittedAt: addDays(-7), lastTimeSpent: 3 * 3600 + 52 * 60, lastAttemptId: 'a1' }),
+    mock('cma-part-1', 'full_mock', 'Full mock 1', 1, { attempts: 1, lastPercent: 70, lastSubmittedAt: addDays(-7), lastTimeSpent: 3 * 3600 + 52 * 60, lastAttemptId: 'a1' }),
     mock('cma-part-1', 'full_mock', 'Full mock 2', 2),
     mock('cma-part-1', 'practice_set', 'CBQ practice set', 3, { practiceDone: 4 }),
     mock('cma-part-2', 'full_mock', 'Full mock 1', 1),
     mock('cma-part-2', 'full_mock', 'Full mock 2', 2),
     mock('cma-part-2', 'practice_set', 'CBQ practice set', 3),
-    mock('cpa-far', 'full_mock', 'Full mock 1', 1, { attempts: 1, lastPercent: 61, lastSubmittedAt: addDays(-16), lastTimeSpent: 3 * 3600 + 58 * 60, lastAttemptId: 'a3' }),
+    mock('cpa-far', 'full_mock', 'Full mock 1', 1, { attempts: 1, lastPercent: 65, lastSubmittedAt: addDays(-16), lastTimeSpent: 3 * 3600 + 58 * 60, lastAttemptId: 'a3' }),
     mock('cpa-far', 'full_mock', 'Full mock 2', 2),
     mock('cpa-far', 'practice_set', 'TBS practice set', 3, { practiceDone: 6 }),
   ];
