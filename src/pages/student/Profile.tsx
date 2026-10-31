@@ -11,12 +11,11 @@ import { isDemo } from '@/lib/supabase';
 import { isStaffRole, type Account, type AccessGroup } from '@/lib/types';
 
 export const SUPPORT_CONTACT = '[YOUR SUPPORT EMAIL / WHATSAPP NUMBER]';
-const RENEW_NOTE = 'Online renewal opens here once payments are connected. Please contact the academy to renew.';
 
-function accessBadge(a: AccessGroup) {
+function accessBadge(a: AccessGroup, short = false) {
   if (a.status === 'expired') return <Pill tone="expired">Expired</Pill>;
-  if (a.status === 'ending') return <Pill tone="ending">Ends in {a.daysLeft} days</Pill>;
-  return <Pill tone="active">Active · {a.daysLeft} days left</Pill>;
+  if (a.status === 'ending') return <Pill tone="ending">{short ? `${a.daysLeft} days` : `Ends in ${a.daysLeft} days`}</Pill>;
+  return <Pill tone="active">{short ? `${a.daysLeft} days` : `Active · ${a.daysLeft} days left`}</Pill>;
 }
 
 function EditProfileModal({ open, onClose, account }: { open: boolean; onClose: () => void; account: Account }) {
@@ -258,7 +257,6 @@ export default function Profile() {
     await signOut(everywhere);
     navigate('/login');
   };
-  const renew = () => toast.show(RENEW_NOTE, 'info');
   const examText = p.targetExamDate ? `${p.targetCourseLabel ?? 'Exam'} · ${formatDate(`${p.targetExamDate}T00:00:00`)}` : 'Not set';
 
   const sheetTitle: Record<Exclude<Sheet, null>, string> = {
@@ -338,13 +336,7 @@ export default function Profile() {
                     {a.status === 'ending' && <span className="text-xs font-bold text-warn-text">Ends in {a.daysLeft} days</span>}
                     {a.status === 'expired' && <span className="text-xs font-bold text-ink-2">Expired</span>}
                   </span>
-                  {a.status === 'active' ? (
-                    <Pill tone="active">{a.daysLeft} days</Pill>
-                  ) : (
-                    <button type="button" onClick={renew} className="btn-warn h-11 px-3.5 text-[13px]">
-                      Renew
-                    </button>
-                  )}
+                  {accessBadge(a, true)}
                 </li>
               ))}
             </ul>
@@ -371,12 +363,8 @@ export default function Profile() {
                         <td className={`px-3 py-3.5 text-ink-2 ${b}`}>{formatDate(a.validUntil)}</td>
                         <td className={`px-3 py-3.5 ${b}`}>{accessBadge(a)}</td>
                         <td className={`py-1.5 text-right ${b}`}>
-                          {a.status === 'active' ? (
+                          {a.status !== 'expired' && (
                             <Link to="/courses" className="link-brand">Open</Link>
-                          ) : (
-                            <button type="button" onClick={renew} className="btn-warn h-11 px-4">
-                              Renew
-                            </button>
                           )}
                         </td>
                       </tr>

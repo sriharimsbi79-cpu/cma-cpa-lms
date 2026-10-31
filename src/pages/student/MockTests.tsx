@@ -32,6 +32,9 @@ function groupTests(tests: MockTest[]): Group[] {
   return [...map.values()];
 }
 
+/** Every action button in a row has the same size, whatever its label. */
+const ACTION_BTN = 'w-[104px] shrink-0 px-2 text-[13px] lg:w-[140px] lg:text-sm';
+
 function practiceUnit(isCma: boolean) {
   return isCma ? 'cases' : 'simulations';
 }
@@ -79,20 +82,20 @@ function TestRow({ t, isCma, first, last }: { t: MockTest; isCma: boolean; first
           <span className="text-sm text-ink-3">—</span>
         )}
       </span>
-      <div className="flex gap-2">
+      <div className="ml-auto flex shrink-0 justify-end gap-2">
         {attempted && !isPractice && (
-          <Link to={`/results/${t.lastAttemptId}`} className="btn-secondary hidden px-4 lg:inline-flex">
+          <Link to={`/results/${t.lastAttemptId}`} className={cx('btn-secondary hidden lg:inline-flex', ACTION_BTN)}>
             Review answers
           </Link>
         )}
         <Link
           to={action.label === 'Review' ? `/results/${t.lastAttemptId}` : href}
-          className={cx('px-3.5 text-[13px] lg:px-4 lg:text-sm', action.primary ? 'btn-primary' : 'btn-secondary', action.label === 'Review' && 'lg:hidden')}
+          className={cx(ACTION_BTN, action.primary ? 'btn-primary' : 'btn-secondary', action.label === 'Review' && 'lg:hidden')}
         >
           {action.label}
         </Link>
         {attempted && !isPractice && (
-          <Link to={href} className="btn-secondary hidden px-4 lg:inline-flex">
+          <Link to={href} className={cx('btn-secondary hidden lg:inline-flex', ACTION_BTN)}>
             Retake
           </Link>
         )}

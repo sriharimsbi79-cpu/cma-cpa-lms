@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AlertTriangle, CalendarDays, ChevronRight, ClipboardList, FileText, Play, Search } from 'lucide-react';
+import { CalendarDays, ChevronRight, ClipboardList, FileText, Play, Search } from 'lucide-react';
 import Notifications from '@/components/Notifications';
 import { Avatar, CourseIcon, ErrorState, PageLoader, ProgressBar } from '@/components/ui';
 import { useAccount, useCatalog, useFocusAreas, useRecentResults, useResume } from '@/lib/api';
@@ -16,7 +16,9 @@ import {
   minutesLabel,
   pct,
 } from '@/lib/format';
+import { programHref, SKILLS_SLUG, summarizePrograms } from '@/lib/programs';
 import type { CatalogCourse, Resume } from '@/lib/types';
+import { ProgramBadge } from './Courses';
 
 const SOON_DAYS = 15;
 
@@ -75,34 +77,6 @@ function Header() {
         </div>
       </header>
     </>
-  );
-}
-
-function ExpiryBanner({ courses }: { courses: CatalogCourse[] }) {
-  const soon = courses
-    .filter((c) => c.enrolled && c.daysLeft !== null && c.daysLeft <= SOON_DAYS)
-    .sort((a, b) => (a.daysLeft ?? 0) - (b.daysLeft ?? 0))[0];
-  if (!soon) return null;
-  const name = soon.kind === 'skill' ? soon.name : soon.programName;
-  const days = soon.daysLeft === 0 ? 'today' : `in ${soon.daysLeft} day${soon.daysLeft === 1 ? '' : 's'}`;
-  return (
-    <div role="status" className="flex items-center gap-3 rounded-2xl border border-warn-line bg-warn-bg py-2.5 pl-3.5 pr-2.5 text-warn-fg lg:gap-4 lg:px-[18px] lg:py-3.5">
-      <AlertTriangle aria-hidden className="size-5 shrink-0" />
-      <p className="flex-1 text-[13px] leading-snug lg:text-sm">
-        <strong className="block font-bold lg:inline">
-          {name} access ends {days}
-        </strong>
-        <span className="lg:hidden">Valid till {formatDate(soon.validUntil)}</span>
-        <span className="hidden lg:inline">
-          {' '}
-          ({formatDate(soon.validUntil)}). Renew now so your classes and mocks are not interrupted.
-        </span>
-      </p>
-      <Link to="/profile" className="btn-warn shrink-0 px-3.5 text-[13px] lg:px-[18px] lg:text-sm">
-        <span className="lg:hidden">Renew</span>
-        <span className="hidden lg:inline">Renew access</span>
-      </Link>
-    </div>
   );
 }
 
@@ -301,7 +275,43 @@ function ExamCard({ courses }: { courses: CatalogCourse[] }) {
 }
 
 function MyCourses({ courses }: { courses: CatalogCourse[] }) {
-  const mine = courses.filter((c) => c.enrolled);
+  const programs = summarizePrograms(courses);
+  type Item = { key: string; href: string; icon: JSX.Element; title: string; sub: string; done: number; total: number; unit: string; progress: number; daysLeft: number | null; validUntil: string | null };
+  const items: Item[] = [];
+  for (const p of programs) {
+    if (p.slug === SKILLS_SLUG) {
+      for (const c of p.subjects.filter((s) => s.enrolled)) {
+        items.push({
+          key: c.courseId,
+          href: `/courses/${c.courseId}`,
+          icon: <CourseIcon kind={c.kind} code={c.code} size={40} />,
+          title: c.name,
+          sub: 'Technical skills',
+          done: c.chaptersDone,
+          total: c.chaptersTotal,
+          unit: 'modules',
+          progress: c.progress,
+          daysLeft: c.daysLeft,
+          validUntil: c.validUntil,
+        });
+      }
+    } else if (p.enrolledCount > 0) {
+      const mine = p.subjects.filter((s) => s.enrolled).map((s) => s.name);
+      items.push({
+        key: p.slug,
+        href: programHref(p.slug),
+        icon: <ProgramBadge slug={p.slug} short={p.short} size="lg" />,
+        title: p.name,
+        sub: mine.join(' · '),
+        done: p.chaptersDone,
+        total: p.chaptersTotal,
+        unit: 'chapters',
+        progress: p.progress,
+        daysLeft: p.daysLeft,
+        validUntil: p.validUntil,
+      });
+    }
+  }
   return (
     <section aria-labelledby="courses-h" className="flex flex-col gap-2 lg:gap-4">
       <div className="flex items-center justify-between">
@@ -313,38 +323,37 @@ function MyCourses({ courses }: { courses: CatalogCourse[] }) {
           <span className="hidden lg:inline">View all</span>
         </Link>
       </div>
-      {mine.length === 0 ? (
+      {items.length === 0 ? (
         <p className="card p-5 text-sm text-ink-3">No active courses. Explore courses to enroll.</p>
       ) : (
         <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] sm:gap-4 sm:overflow-visible sm:px-0">
-          {mine.map((c) => {
-            const unit = c.kind === 'skill' ? 'modules' : 'chapters';
+          {items.map((c) => {
             const soon = c.daysLeft !== null && c.daysLeft <= SOON_DAYS;
             return (
               <Link
-                key={c.courseId}
-                to={`/courses/${c.courseId}`}
+                key={c.key}
+                to={c.href}
                 className="card flex w-[200px] shrink-0 flex-col gap-2.5 rounded-2xl p-3.5 hover:border-line-strong sm:w-auto sm:gap-3.5 sm:p-5"
               >
                 <span className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
-                  <CourseIcon kind={c.kind} code={c.code} size={40} />
+                  {c.icon}
                   <span className="flex min-w-0 flex-col">
-                    <span className="text-sm font-bold sm:text-[15px]">{courseTitle(c)}</span>
+                    <span className="text-sm font-bold sm:text-[15px]">{c.title}</span>
                     <span className="text-xs text-ink-3 sm:hidden">
-                      {c.chaptersDone} of {c.chaptersTotal} {unit}
+                      {c.done} of {c.total} {c.unit}
                     </span>
-                    <span className="hidden text-[13px] leading-snug text-ink-3 sm:block">{c.kind === 'skill' ? 'Technical skills' : c.fullName}</span>
+                    <span className="hidden text-[13px] leading-snug text-ink-3 sm:block">{c.sub}</span>
                   </span>
                 </span>
                 <span className="flex flex-col gap-1.5">
                   <span className="hidden justify-between text-[13px] sm:flex">
                     <span className="text-ink-3">
-                      {c.chaptersDone} of {c.chaptersTotal} {unit}
+                      {c.done} of {c.total} {c.unit}
                     </span>
                     <span className="font-bold">{c.progress}%</span>
                   </span>
                   <span className="flex items-center gap-2">
-                    <ProgressBar value={c.progress} label={`${courseTitle(c)} progress`} height="h-1.5" className="flex-1" />
+                    <ProgressBar value={c.progress} label={`${c.title} progress`} height="h-1.5" className="flex-1" />
                     <span className="text-xs font-bold sm:hidden">{c.progress}%</span>
                   </span>
                 </span>
@@ -352,9 +361,9 @@ function MyCourses({ courses }: { courses: CatalogCourse[] }) {
                   {soon ? (
                     <span className="font-semibold text-warn-text">Ends in {c.daysLeft} days</span>
                   ) : (
-                    <span className="text-ink-3">Valid till {formatDate(c.validUntil)}</span>
+                    <span className="text-ink-3">{c.validUntil ? `Valid till ${formatDate(c.validUntil)}` : ''}</span>
                   )}
-                  <span className="font-bold text-brand">Continue</span>
+                  <span className="font-bold text-brand">Open</span>
                 </span>
               </Link>
             );
@@ -487,7 +496,6 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-4 lg:gap-6">
       <Header />
-      <ExpiryBanner courses={courses} />
       <div className="flex flex-wrap gap-4 lg:gap-6">
         {resume.data ? <ContinueCard r={resume.data} /> : <StartCard hasCourses={courses.some((c) => c.enrolled)} />}
         <ExamCard courses={courses} />

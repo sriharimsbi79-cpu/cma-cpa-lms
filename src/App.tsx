@@ -12,6 +12,7 @@ import Exam from '@/pages/student/Exam';
 import Home from '@/pages/student/Home';
 import MockTests from '@/pages/student/MockTests';
 import Profile from '@/pages/student/Profile';
+import Program from '@/pages/student/Program';
 import Result from '@/pages/student/Result';
 import TestIntro from '@/pages/student/TestIntro';
 
@@ -56,6 +57,7 @@ export default function App() {
       >
         <Route index element={<Home />} />
         <Route path="courses" element={<Courses />} />
+        <Route path="programs/:slug" element={<Program />} />
         <Route path="courses/:courseId" element={<Course />} />
         <Route path="chapters/:chapterId" element={<Chapter />} />
         <Route path="mock-tests" element={<MockTests />} />

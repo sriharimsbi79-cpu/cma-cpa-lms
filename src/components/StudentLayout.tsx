@@ -5,23 +5,19 @@ import { useCatalog, useChapter } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { cx } from '@/lib/format';
 import { isDemo } from '@/lib/supabase';
-import { isStaffRole, type CatalogCourse } from '@/lib/types';
+import { programHref, SKILLS_SLUG, summarizePrograms } from '@/lib/programs';
+import { isStaffRole } from '@/lib/types';
 import { Avatar, LockIcon, Logo } from './ui';
 
-function useActiveCourseId(): string | null {
+function useActiveCourse(): { courseId: string | null; programSlug: string | null } {
+  const program = useMatch('/programs/:slug');
   const course = useMatch('/courses/:courseId');
   const chapter = useMatch('/chapters/:chapterId');
+  const { data: catalog } = useCatalog();
   const { data: ch } = useChapter(chapter?.params.chapterId);
-  return course?.params.courseId ?? ch?.courseId ?? null;
-}
-
-function groupByProgram(courses: CatalogCourse[]) {
-  const map = new Map<string, { name: string; short: string; slug: string; courses: CatalogCourse[] }>();
-  for (const c of courses) {
-    if (!map.has(c.programId)) map.set(c.programId, { name: c.programName, short: c.programShort, slug: c.programSlug, courses: [] });
-    map.get(c.programId)!.courses.push(c);
-  }
-  return [...map.values()];
+  const courseId = course?.params.courseId ?? ch?.courseId ?? null;
+  const slug = program?.params.slug ?? catalog?.find((c) => c.courseId === courseId)?.programSlug ?? null;
+  return { courseId, programSlug: slug };
 }
 
 const navItem =
@@ -31,8 +27,9 @@ function Sidebar() {
   const { me, signOut } = useAuth();
   const navigate = useNavigate();
   const { data: catalog } = useCatalog();
-  const activeCourse = useActiveCourseId();
-  const groups = useMemo(() => groupByProgram(catalog ?? []), [catalog]);
+  const active = useActiveCourse();
+  const programs = useMemo(() => summarizePrograms(catalog ?? []), [catalog]);
+  const skills = programs.find((p) => p.slug === SKILLS_SLUG);
 
   return (
     <div className="hidden w-[264px] shrink-0 bg-navy lg:block">
@@ -59,57 +56,53 @@ function Sidebar() {
           Courses
         </NavLink>
         <div className="flex flex-col gap-0.5 pl-[30px]">
-          {groups.map((g) =>
-            g.slug === 'cpa-usa' ? (
-              <div key={g.slug}>
-                <p className="px-3 pb-1 pt-2.5 text-xs font-bold text-navy-muted">{g.name}</p>
-                <div className="grid grid-cols-3 gap-1.5 pb-1 pl-2">
-                  {g.courses.map((c) => {
-                    const on = activeCourse === c.courseId;
-                    return (
-                      <Link
-                        key={c.courseId}
-                        to={`/courses/${c.courseId}`}
-                        aria-current={on ? 'page' : undefined}
-                        aria-label={c.enrolled ? c.name : `${c.name}, not enrolled`}
-                        className={cx(
-                          'flex h-11 items-center justify-center gap-1 rounded-lg text-[13px] font-semibold transition-colors',
-                          on ? 'bg-white text-navy' : c.enrolled ? 'bg-navy-2 text-navy-text hover:bg-navy-3' : 'bg-navy-2/60 text-navy-dim hover:bg-navy-3',
-                        )}
-                      >
-                        {c.name}
-                        {!c.enrolled && <LockIcon className="size-3" />}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              <div key={g.slug}>
-                <p className="px-3 pb-0.5 pt-2.5 text-xs font-bold text-navy-muted">{g.name}</p>
-                {g.courses.map((c) => {
-                  const on = activeCourse === c.courseId;
-                  return (
-                    <Link
-                      key={c.courseId}
-                      to={`/courses/${c.courseId}`}
-                      aria-current={on ? 'page' : undefined}
-                      aria-label={c.enrolled ? undefined : `${c.name}, not enrolled`}
-                      className={cx(
-                        'flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm leading-6 transition-colors',
-                        on ? 'bg-navy-3 font-bold text-white' : c.enrolled ? 'text-navy-text hover:bg-navy-2' : 'text-navy-dim hover:bg-navy-2',
-                      )}
-                    >
-                      <span className="flex items-center gap-2">
-                        {on && <span aria-hidden className="size-1.5 rounded-full bg-white" />}
-                        {c.name}
-                      </span>
-                      {!c.enrolled && <LockIcon />}
-                    </Link>
-                  );
-                })}
-              </div>
-            ),
+          {programs
+            .filter((p) => p.slug !== SKILLS_SLUG)
+            .map((p) => {
+              const on = active.programSlug === p.slug;
+              return (
+                <Link
+                  key={p.slug}
+                  to={programHref(p.slug)}
+                  aria-current={on ? 'page' : undefined}
+                  className={cx(
+                    'flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm leading-6 transition-colors',
+                    on ? 'bg-navy-3 font-bold text-white' : p.enrolledCount ? 'text-navy-text hover:bg-navy-2' : 'text-navy-dim hover:bg-navy-2',
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    {on && <span aria-hidden className="size-1.5 rounded-full bg-white" />}
+                    {p.name}
+                  </span>
+                  {p.enrolledCount === 0 && <LockIcon />}
+                </Link>
+              );
+            })}
+          {skills && (
+            <div>
+              <p className="px-3 pb-0.5 pt-2.5 text-xs font-bold text-navy-muted">{skills.name}</p>
+              {skills.subjects.map((c) => {
+                const on = active.courseId === c.courseId;
+                return (
+                  <Link
+                    key={c.courseId}
+                    to={`/courses/${c.courseId}`}
+                    aria-current={on ? 'page' : undefined}
+                    aria-label={c.enrolled ? undefined : `${c.name}, not enrolled`}
+                    className={cx(
+                      'flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm leading-6 transition-colors',
+                      on ? 'bg-navy-3 font-bold text-white' : c.enrolled ? 'text-navy-text hover:bg-navy-2' : 'text-navy-dim hover:bg-navy-2',
+                    )}
+                  >
+                    <span className="flex items-center gap-2">
+                      {on && <span aria-hidden className="size-1.5 rounded-full bg-white" />}
+                      {c.name}
+                    </span>
+                    {!c.enrolled && <LockIcon />}
+                  </Link>
+                );
+              })}
+            </div>
           )}
         </div>
         <NavLink
@@ -162,7 +155,7 @@ function BottomTabs() {
   const { pathname } = useLocation();
   const tabs = [
     { to: '/', label: 'Home', icon: Home, on: pathname === '/' },
-    { to: '/courses', label: 'Courses', icon: BookOpen, on: pathname.startsWith('/courses') || pathname.startsWith('/chapters') },
+    { to: '/courses', label: 'Courses', icon: BookOpen, on: pathname.startsWith('/courses') || pathname.startsWith('/programs') || pathname.startsWith('/chapters') },
     { to: '/mock-tests', label: 'Mock tests', icon: ClipboardList, on: pathname.startsWith('/mock-tests') || pathname.startsWith('/tests') },
     { to: '/profile', label: 'Profile', icon: User, on: pathname.startsWith('/profile') },
   ];

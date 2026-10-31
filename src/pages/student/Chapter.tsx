@@ -4,9 +4,10 @@ import { BookOpen, Check, ChevronLeft, ChevronRight, ClipboardList, FileText, Me
 import { useToast } from '@/components/Toast';
 import VideoPlayer from '@/components/VideoPlayer';
 import { EmptyState, ErrorState, Modal, PageLoader, ProgressBar } from '@/components/ui';
-import { useAskDoubt, useChapter, useMarkVideo, useOpenEbook, useSaveNote } from '@/lib/api';
+import { useAskDoubt, useCatalog, useChapter, useMarkVideo, useOpenEbook, useSaveNote } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { clock, cx, plural } from '@/lib/format';
+import { parentHref } from '@/lib/programs';
 import { isDemo } from '@/lib/supabase';
 import type { ChapterDetail, VideoItem } from '@/lib/types';
 
@@ -61,6 +62,8 @@ export default function Chapter() {
   const toast = useToast();
   const { me } = useAuth();
   const { data: ch, isLoading, error, refetch } = useChapter(chapterId);
+  const { data: catalog } = useCatalog();
+  const course = catalog?.find((c) => c.courseId === ch?.courseId);
   const markVideo = useMarkVideo();
   const openEbook = useOpenEbook();
   const saveNote = useSaveNote();
@@ -181,7 +184,19 @@ export default function Chapter() {
           </li>
           <li aria-hidden>/</li>
           <li>
-            <Link to={`/courses/${ch.courseId}`} className="hover:text-ink">{ch.courseLabel}</Link>
+            <Link to="/courses" className="hover:text-ink">Courses</Link>
+          </li>
+          {course && course.kind !== 'skill' && (
+            <>
+              <li aria-hidden>/</li>
+              <li>
+                <Link to={parentHref(course)} className="hover:text-ink">{course.programName}</Link>
+              </li>
+            </>
+          )}
+          <li aria-hidden>/</li>
+          <li>
+            <Link to={`/courses/${ch.courseId}`} className="hover:text-ink">{course?.name ?? ch.courseLabel}</Link>
           </li>
           <li aria-hidden>/</li>
           <li aria-current="page" className="font-semibold text-ink">Chapter {ch.position}</li>

@@ -373,7 +373,7 @@ export function account(): Account {
 
 export function notifications(): AppNotification[] {
   return [
-    { id: 'n1', title: 'Your CPA USA access ends in 12 days', body: 'Renew now so your classes and mock tests are not interrupted.', link: '/profile', createdAt: hoursAgo(5), readAt: null },
+    { id: 'n1', title: 'Your CPA USA access ends in 12 days', body: 'Check the validity of each course on your Profile page.', link: '/profile', createdAt: hoursAgo(5), readAt: null },
     { id: 'n2', title: 'New videos in CMA Part 1 · Chapter 4', body: '3 new videos on cost management were added.', link: '/courses/cma-part-1', createdAt: hoursAgo(28), readAt: null },
   ];
 }

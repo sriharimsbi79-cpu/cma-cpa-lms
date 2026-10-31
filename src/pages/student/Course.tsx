@@ -5,6 +5,7 @@ import { useToast } from '@/components/Toast';
 import { EmptyState, ErrorState, PageLoader, ProgressBar } from '@/components/ui';
 import { useCatalog, useCourseChapters } from '@/lib/api';
 import { cx, formatDate, plural } from '@/lib/format';
+import { parentHref } from '@/lib/programs';
 import type { CatalogCourse, ChapterRow } from '@/lib/types';
 import { ENROLL_NOTE } from './Courses';
 
@@ -209,7 +210,7 @@ export default function Course() {
     <div className="flex flex-col gap-4 lg:gap-5">
       {/* phone header */}
       <div className="-mt-2 grid grid-cols-[44px_1fr_44px] items-center lg:hidden">
-        <Link to="/courses" aria-label="Back to courses" className="flex size-11 items-center justify-center rounded-xl">
+        <Link to={parentHref(course)} aria-label={course.kind === 'skill' ? 'Back to courses' : `Back to ${course.programName}`} className="flex size-11 items-center justify-center rounded-xl">
           <ChevronLeft aria-hidden className="size-[22px]" />
         </Link>
         <p className="text-center text-[15px] font-bold">{course.kind === 'skill' ? 'Technical skills' : course.programName}</p>
@@ -222,8 +223,16 @@ export default function Course() {
           </li>
           <li aria-hidden>/</li>
           <li>
-            <Link to="/courses" className="hover:text-ink">{course.kind === 'skill' ? 'Technical skills' : course.programName}</Link>
+            <Link to="/courses" className="hover:text-ink">Courses</Link>
           </li>
+          {course.kind !== 'skill' && (
+            <>
+              <li aria-hidden>/</li>
+              <li>
+                <Link to={parentHref(course)} className="hover:text-ink">{course.programName}</Link>
+              </li>
+            </>
+          )}
           <li aria-hidden>/</li>
           <li aria-current="page" className="font-semibold text-ink">{course.name}</li>
         </ol>
